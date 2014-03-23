@@ -5,7 +5,7 @@
 	<title>Phaser - Getting started</title>
 	<script type="text/javascript" src="phaser.min.js"></script>
 	<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
-	<script src="js/bootstrap.js"></script>
+	<script src="bootstrap.js"></script>
 	<link href="css/bootstrap.css" rel="stylesheet">
 	<link href="css/portfolio-item.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -46,6 +46,7 @@ function create(){
 	
 	textGroup = game.add.group();
 	game.physics.startSystem(Phaser.Physics.P2JS);
+	game.physics.p2.gravity.y = 500;
 	game.physics.p2.defaultRestitution = 0.8; 	
 
 	interactive = ['I','N','T','E','R','A','C','T','I','V','E'];
@@ -64,8 +65,8 @@ function create(){
 		textGroup.add(text);
 	}	
 	
-	ground = game.add.sprite(0, height, 'ground');
- 	player = game.add.sprite(30, height - 180, 'player');
+	ground = game.add.sprite(width/2, height-100, 'ground');
+ 	player = game.add.sprite(30, height - 200, 'player');
 
  	ground.width = width;
 	ground.alpha = 1;
@@ -79,7 +80,6 @@ function create(){
 
 	player.body.collideWorldBounds = true;
 	ground.body.collideWorldBounds = true;
-	ground.body.immovable = true;
 
 	cursors = game.input.keyboard.createCursorKeys();
 }
@@ -93,28 +93,22 @@ function update(){
 
 			textGroup.forEach(function(item) {
 				game.add.tween(item).to( { alpha: 0 }, 500, Phaser.Easing.None, true);
-    		});
+    		});	
 		}
+	}
 
-		game.physics.arcade.collide(player, ground);
+	if(started){
 		player.body.velocity.x = 0;
 
-		if(started){
-			sprite.body.setZeroVelocity();
-
-		    if (cursors.left.isDown){
-		    	sprite.body.moveLeft(400);
-		    }
-		    else if (cursors.right.isDown){
-		    	sprite.body.moveRight(400);
-		    }
-		    
-		    if (cursors.up.isDown){
-		    	sprite.body.moveUp(400);
-		    }
-		    else if (cursors.down.isDown){
-		    	sprite.body.moveDown(400);
-		    }
+		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A) ){
+			player.body.moveLeft(200);
+		}
+		else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D) ){
+			player.body.moveRight(200);
+		}
+		
+		if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) ){
+			player.body.velocity.y = -300;
 		}
 	}
 }
