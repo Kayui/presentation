@@ -45,6 +45,8 @@ function create(){
 	style = { font: "Times New Roman", fill: "#2A2F35", align: "center" };
 	
 	textGroup = game.add.group();
+	game.physics.startSystem(Phaser.Physics.P2JS);
+	game.physics.p2.defaultRestitution = 0.8; 	
 
 	interactive = ['I','N','T','E','R','A','C','T','I','V','E'];
 	/* i n t e r a c t i v e */
@@ -60,40 +62,59 @@ function create(){
 		var text = game.add.text(55  + (i * 75), 110, presentation[i], style);
 		text.fontSize = 50;
 		textGroup.add(text);
-	}
-
-	//var spaceBar = game.add.sprite(165, 300, '1');
+	}	
+	
 	ground = game.add.sprite(0, height, 'ground');
-	ground.width = width;
-	game.physics.startSystem(Phaser.Physics.ARCADE);
-	game.physics.arcade.gravity.y = 100;
+ 	player = game.add.sprite(30, height - 180, 'player');
+
+ 	ground.width = width;
+	ground.alpha = 1;
+	player.alpha = 1;
+
+	game.physics.p2.enable(player);
+	game.physics.p2.enable(ground);
+
+	game.add.existing(player);
+	game.add.existing(ground);
+
+	player.body.collideWorldBounds = true;
+	ground.body.collideWorldBounds = true;
+	ground.body.immovable = true;
+
+	cursors = game.input.keyboard.createCursorKeys();
 }
 
 function update(){
-	if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.S) ){
+	if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
 		if(!started){
 			started = true;
-			game.add.tween(ground).to( { y: height-100 }, 600, Phaser.Easing.Bounce.Out, true);
+			game.add.tween(ground).to( { alpha: 1 }, 800, Phaser.Easing.None, true);
+			game.add.tween(player).to( { alpha: 1 }, 800, Phaser.Easing.None, true);
+
 			textGroup.forEach(function(item) {
 				game.add.tween(item).to( { alpha: 0 }, 500, Phaser.Easing.None, true);
     		});
-    		player = game.add.sprite(30, height - 180, 'player');
-    		game.physics.enable(player, Phaser.Physics.ARCADE);
-    		game.add.existing(player);
-    		player.body.collideWorldBounds = true;
-    		player.body.setCollisionGroup(worldCollisionGroup);
-
-    		game.physics.enable(ground, Phaser.Physics.ARCADE);
-    		game.add.existing(ground);
-    		ground.body.collideWorldBounds = true;
-    		ground.body.setCollisionGroup(worldCollisionGroup);
-    		ground.body.immovable = true;
 		}
 
-		game.physics.arcade.collide(ground, player);
+		game.physics.arcade.collide(player, ground);
+		player.body.velocity.x = 0;
 
 		if(started){
+			sprite.body.setZeroVelocity();
 
+		    if (cursors.left.isDown){
+		    	sprite.body.moveLeft(400);
+		    }
+		    else if (cursors.right.isDown){
+		    	sprite.body.moveRight(400);
+		    }
+		    
+		    if (cursors.up.isDown){
+		    	sprite.body.moveUp(400);
+		    }
+		    else if (cursors.down.isDown){
+		    	sprite.body.moveDown(400);
+		    }
 		}
 	}
 }
@@ -108,3 +129,4 @@ function addClassToCanvas(){
 
 </script>
 </body>
+
