@@ -1,0 +1,110 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+	<title>Phaser - Getting started</title>
+	<script type="text/javascript" src="phaser.min.js"></script>
+	<script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<link href="css/portfolio-item.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+
+<script type="text/javascript">
+
+/* Creating The Game Variable */
+var width = 1024;
+var height = 768;
+var game = new Phaser.Game(width, height, Phaser.AUTO, '', { preload: preload, create: create, update: update});
+game.transparent = true;
+
+
+/* Loading of assets goes here. */
+function preload(){
+	game.load.image('ground', 'assets/ground.png');
+	game.load.image('player', 'assets/player.png');
+}
+
+/* Globals */
+var style;
+var interactive;
+var presentation;
+var started = false;
+
+var textGroup;
+var ground;
+var player;
+
+var worldCollisionGroup;
+
+/* This functions serves for setting up initial variables. */
+function create(){    
+	addClassToCanvas(); /* Making sure this always fits inside the browser */
+	style = { font: "Times New Roman", fill: "#2A2F35", align: "center" };
+	
+	textGroup = game.add.group();
+
+	interactive = ['I','N','T','E','R','A','C','T','I','V','E'];
+	/* i n t e r a c t i v e */
+	for(var i = 0; i < 11; i++){
+		var text = game.add.text(30 + (i * 87), 5, interactive[i], style);
+		text.fontSize = 60;
+		textGroup.add(text);
+	}
+
+	presentation = ['P','R','E','S','E','N','T','A','T','I','O','N'];
+	/* p r e s e n t a t i o n */
+	for(var i = 0; i < 12; i++){
+		var text = game.add.text(55  + (i * 75), 110, presentation[i], style);
+		text.fontSize = 50;
+		textGroup.add(text);
+	}
+
+	//var spaceBar = game.add.sprite(165, 300, '1');
+	ground = game.add.sprite(0, height, 'ground');
+	ground.width = width;
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.physics.arcade.gravity.y = 100;
+}
+
+function update(){
+	if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.S) ){
+		if(!started){
+			started = true;
+			game.add.tween(ground).to( { y: height-100 }, 600, Phaser.Easing.Bounce.Out, true);
+			textGroup.forEach(function(item) {
+				game.add.tween(item).to( { alpha: 0 }, 500, Phaser.Easing.None, true);
+    		});
+    		player = game.add.sprite(30, height - 180, 'player');
+    		game.physics.enable(player, Phaser.Physics.ARCADE);
+    		game.add.existing(player);
+    		player.body.collideWorldBounds = true;
+    		player.body.setCollisionGroup(worldCollisionGroup);
+
+    		game.physics.enable(ground, Phaser.Physics.ARCADE);
+    		game.add.existing(ground);
+    		ground.body.collideWorldBounds = true;
+    		ground.body.setCollisionGroup(worldCollisionGroup);
+    		ground.body.immovable = true;
+		}
+
+		game.physics.arcade.collide(ground, player);
+
+		if(started){
+
+		}
+	}
+}
+
+/* Making sure this always fits inside the browser */
+function addClassToCanvas(){   
+	$('canvas').addClass('img-responsive');
+
+
+
+} 
+
+</script>
+</body>

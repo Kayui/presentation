@@ -1,0 +1,36 @@
+#chat_box{
+	position: relative;
+ 	min-height: 1px;
+  	padding-right: 15px;
+  	padding-left: 15px;
+    width: 100%;
+    max-width: 100%;
+    height: 400;
+    max-height: 400;
+    resize:none;
+}
+
+#message_input{
+	position: relative;
+ 	min-height: 1px;
+    width: 100%;
+    resize:none;
+}
+
+#send_button{
+	position: relative;
+	min-height: 1px;
+	width: 100%;
+}
+
+#aroundControlsLeft{
+	padding-top: 1px;
+	padding-left: 0px !important;
+	padding-right: 1px;
+}
+
+#aroundControlsRight{
+	padding-top: 1px;
+	padding-left: 1px !important;
+	padding-right: 0px;
+}
