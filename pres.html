@@ -27,21 +27,23 @@ function preload(){
 	game.load.image('ground', 'assets/ground.png');
 	game.load.image('ground2', 'assets/ground2.png');
 	game.load.image('backdrop1', 'assets/backdrop1.png');
-	game.load.image('wall', 'assets/wall.png');
+	game.load.image('biggerPicture', 'assets/biggerPicture.png');
+	game.load.image('biggerPicture2', 'assets/biggerPicture2.png');
 	game.load.image('player', 'assets/player.png');
 	game.load.image('player2', 'assets/player2.png');
 	game.load.image('player3', 'assets/player3.png');
 	game.load.image('player4', 'assets/player4.png');
 	game.load.image('player5', 'assets/player5.png');
 	game.load.image('player6', 'assets/player6.png');
+	game.load.image('playerSword', 'assets/playerSword.png');
 	game.load.image('playerControls', 'assets/playerControls.png');
-	game.load.image('rope', 'assets/rope.png');
 	game.load.image('eye', 'assets/eye.png');
 	game.load.image('dino', 'assets/dino.png');
 	game.load.image('eyeRight', 'assets/eyeRight.png');
 	game.load.image('eyeLeft', 'assets/eyeLeft.png');
 	game.load.image('black', 'assets/black.png');
 	game.load.image('arrow', 'assets/arrow.png');
+	game.load.image('heart', 'assets/heart.png');
 }
 
 /* Globals */
@@ -64,6 +66,12 @@ var jumping = false;
 var tweenBlocked = false;
 var leftBlocked = false;
 var rightBlocked = true;
+var moveEnabled = true;
+var countDown = false;
+var moveLeftEnabled = false;
+var moveRightEnabled = true;
+
+var debugVersion = false; /* This passes scenes really fast. */
 
 /* Integers */
 var playerSpeed = 500;
@@ -93,6 +101,18 @@ var mainTextSix;
 var mainTextSeven;
 var mainTextEight;
 var mainTextNine;
+
+/* Part four, interactive nature */
+var mainTextTen;
+
+/* Part five, medium */
+var mainText11;
+var biggerPicture;
+
+/* Part six, extention */
+var mainText12;
+var mainText13;
+var heart;
 
 
 /* This functions serves for setting up initial variables. */
@@ -183,11 +203,9 @@ function create(){
 	arrow.alpha = 0;
 
 	/* Text scene two */
-	mainTextTwo = game.add.text(width/2-155, 0, "BUT THE VIDEOGAMING EXPERIENCE \n IS FIRST AND FOREMOST A SPATIAL ONE", style);
+	mainTextTwo = game.add.text(width/2-155, 0, "BUT THE GAMING EXPERIENCE \n IS FIRST AND FOREMOST A SPATIAL ONE", style);
 	mainTextTwo.alpha = 0;
 	mainTextTwo.font = 'calibri';
-
-	
 }
 
 function update(){
@@ -256,14 +274,21 @@ function update(){
 
 		timer++;
 
-		if(timer > 1200 && ground.body.y > 600){
+		if(debugVersion){
+			var endAtAltitude = gameHeight - 50;
+		}
+		else{
+			var endAtAltitude = 600;	
+		}
+
+		if(timer > 1200 && ground.body.y > endAtAltitude){
 			game.camera.follow();
 			game.camera.y = player.y - height/2;
 			ground.body.moveUp(200);
 			playerSpeed = 250;
-		}	
+		}
 
-		if(ground.body.y < 600){
+		if(ground.body.y < endAtAltitude){
 			timer = 0;
 			activeScene = 'two';
 			game.add.tween(mainTextTwo).to( { alpha: 1 }, 600, Phaser.Easing.None, true);
@@ -334,13 +359,6 @@ function update(){
 			}
 		}
 
-		if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.W)){
-			if(!jumping){
-				player.body.velocity.y = -100;
-				jumping = true;
-			}
-		}
-
 		if(bounceCount < 3){
 			mainTextThree.x = game.camera.x + width/6;
 		}
@@ -375,7 +393,6 @@ function update(){
 
 		if(bounceCount >= 3){
 			if(mainTextFour != null){
-				console.log("here");
 				mainTextFour.x = game.camera.x + width/6;
 			}
 		}
@@ -388,19 +405,103 @@ function update(){
 	/* SCENE FOUR */
 
 	if(activeScene == 'four'){
+		timer++;
 		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A)){
 			player.body.moveLeft(playerSpeed);
 		}
 		else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D)){
 			player.body.moveRight(playerSpeed);
 		}
+
+		if(mainTextTen != null){
+			mainTextTen.x = game.camera.x + width/6;
+		}
+
+		if(timer > 600){
+			dim();
+		}
 	}
+
+	/* SCENE FIVE */
+
+	if(activeScene == 'five'){
+
+		if(countDown){
+			timer++;
+		}
+
+		if(timer > 200){
+			dim();
+		}
+
+		game.camera.follow(player);
+		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A)){
+			if(player.x - 50 > 0 && moveEnabled){
+				moveEnabled = false;
+				movePlayer = game.add.tween(player).to( { x: player.x - 50 }, 400, Phaser.Easing.Bounce.In, true);
+				movePlayer.onComplete.add(enableMove, this);
+			}
+		}
+		else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D)){
+			if(player.x + 50 < gameWidth-50 && moveEnabled){
+				moveEnabled = false;
+				movePlayer = game.add.tween(player).to( { x: player.x + 50 }, 400, Phaser.Easing.Bounce.In, true);
+				movePlayer.onComplete.add(enableMove, this);
+			}
+		}
+
+		if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.W)){
+			if(player.x == 350 && moveEnabled){
+				moveEnabled = false;
+				movePlayer = game.add.tween(player).to( { y: player.y - 70 }, 400, Phaser.Easing.Bounce.In, true);
+				movePlayer.onComplete.add(mergeBoxes, this);	
+			}
+		}
+
+		if(mainText11 != null){
+			mainText11.x = game.camera.x + width/6;
+		}
+	}
+
+	/* SCENE SIX */
+
+	if(activeScene == 'six'){
+		game.camera.follow();
+		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A)){
+			if(player.x - 50 > 0 && moveLeftEnabled){
+				moveLeftEnabled = false;
+				movePlayer = game.add.tween(player).to( { x: player.x - 700 }, 800, Phaser.Easing.Bounce.In, true);
+				movePlayer.onComplete.add(enableRightMove, this);
+			}
+		}
+		else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D)){
+			if(player.x + 50 < gameWidth-50 && moveRightEnabled){
+				moveRightEnabled = false;
+				movePlayer = game.add.tween(player).to( { x: player.x + 700 }, 800, Phaser.Easing.Bounce.In, true);
+				movePlayer.onComplete.add(enableLeftMove, this);
+			}
+		}
+
+		if(bounceCount > 2){
+			timer++;
+			if(timer == 1){
+				mainText13 = game.add.text(width/6, game.camera.y + 300, 'AND THUSLY THE VIDEOGAME IS A \n SUBSET OF OUR EXPERIENCED REALITY', style);
+				mainText13.alpha = 0;
+				game.add.tween(mainText13).to( { alpha: 1 }, 400, Phaser.Easing.None, true);
+			}
+		}
+
+		if(timer > 200){
+			dim();
+		}
+	}
+
 
 	/*
 		PLAYER CONTROLS
 	*/
 
-	if(activeScene != 'intro' && activeScene != 'three' && activeScene != 'four'){
+	if(activeScene != 'intro' && activeScene != 'three' && activeScene != 'four' && activeScene != 'five' && activeScene != 'six' && activeScene != 'seven'){
 		if(timer < 800){
 			player.body.velocity.x = 0;
 		}
@@ -429,11 +530,36 @@ function playerHit(){
 	jumping = false;
 }
 
+function enableMove(){
+	moveEnabled = true;
+}
+
+function enableLeftMove(){
+	bounceCount++;
+	moveLeftEnabled = true;
+	heart.x = 150;
+	player.height = player.height * 4;
+	player.width = player.width * 4;
+}
+
+function enableRightMove(){
+	bounceCount++;
+	moveRightEnabled = true;
+	heart.x = 850;
+	player.height = player.height * 4;
+	player.width = player.width * 4;
+}
+
+function mergeBoxes(){
+	biggerPicture.loadTexture('biggerPicture2');
+	countDown = true;
+}
+
 function dim(){
 	blackOut = true;
 	black = game.add.sprite(game.camera.x + width/2, game.camera.y + height/2, 'black');
 	black.height = 1;
-	black.width = width;
+	black.width = gameWidth;
 	black.anchor.setTo(0.5,0.5);
 	game.add.tween(mainTextTwo).to( { alpha: 0 }, 30, Phaser.Easing.None, true);
 	fadeT = game.add.tween(black).to( { height: height + 300 }, 1400, Phaser.Easing.Cubic.Out, true)
@@ -441,12 +567,70 @@ function dim(){
 		fadeT.onComplete.add(blackInScene3, this);
 	}
 	else if(activeScene == 'three'){
-		activeScene = 'four';
 		fadeT.onComplete.add(blackInScene4, this);
+		activeScene = 'four';
+	}
+	else if(activeScene == 'four'){
+		fadeT.onComplete.add(blackInScene5, this);
+		timer = 0;
+		activeScene = 'five';
+	}
+	else if(activeScene == 'five'){
+		fadeT.onComplete.add(blackInScene6, this);
+		bounceCount = 0;
+		timer = 0;
+		activeScene = 'six';
+	}
+	else if(activeScene == 'six'){
+		fadeT.onComplete.add(blackInScene7, this);
+		timer = 0;
+		activeScene = 'seven';
 	}
 }
 
+function blackInScene7(){
+	player.destroy();
+	heart.destroy();
+	mainText12.destroy();
+	mainText13.destroy();
+	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
+	fadeT.onComplete.add(destroyObject, this);
+	player = game.add.sprite(150, gameHeight - 170, 'player');
+	player.anchor.setTo(0.5,0.5);
+	mainText14 = game.add.text(width/6, game.camera.y + 100, '', style);
+}
+
+
+function blackInScene6(){
+	timer = 0;
+	biggerPicture.destroy();
+	player.destroy();
+	mainText11.destroy();
+	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
+	fadeT.onComplete.add(destroyObject, this);
+	heart = game.add.sprite(850, gameHeight - 170, 'heart');
+	player = game.add.sprite(150, gameHeight - 170, 'player');
+	player.anchor.setTo(0.5,0.5);
+	mainText12 = game.add.text(width/6, game.camera.y + 100, 'THE COMPUTER BECOMES AN EXTENSION OF OUR BODY', style);
+}
+
+function blackInScene5(){
+	timer = 0;
+	player.kill();
+	ground2.kill();
+	dino.kill();
+	mainTextTen.destroy();
+	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
+	fadeT.onComplete.add(destroyObject, this);
+
+	player = game.add.sprite(150, gameHeight - 170, 'player');
+	biggerPicture = game.add.sprite(150, gameHeight - 670, 'biggerPicture');
+
+	mainText11 = game.add.text(width/6, game.camera.y + 100, 'THE BODY IS OUR MAIN MEDIUM \n FOR BEING IN THE WORLD \n     (MERLEAU-PONTY)', style);
+}
+
 function blackInScene4(){
+	timer = 0;
 	player.kill();
 	backdrop1.destroy();
 	mainTextFour.destroy();
@@ -459,7 +643,7 @@ function blackInScene4(){
 	fadeT.onComplete.add(destroyObject, this);
 
 	dino = game.add.sprite(game.camera.x + width - 350, gameHeight - 170, 'dino');
-	player = game.add.sprite(game.camera.x + 150, gameHeight - 170, 'player');
+	player = game.add.sprite(game.camera.x + 150, gameHeight - 170, 'playerSword');
 
 	game.physics.p2.enable(player);
 	game.add.existing(player);
@@ -470,6 +654,7 @@ function blackInScene4(){
 	dino.body.fixedRotation = true;
 
 	dinoConstraint = game.physics.p2.createSpring(player, dino, 150, 5, 1);
+	mainTextTen = game.add.text(game.camera.x + width/6, game.camera.y + 100, 'THE INTERACTIVE NATURE OF VIDEOGAMES \nGROUNDS THE GAMING EXPERIENCE \nWITHIN THE BODY', style);
 }
 
 function blackInScene3(){
@@ -478,7 +663,9 @@ function blackInScene3(){
 	activeScene = 'three';
 	backdrop1 = game.add.sprite(gameWidth - 600, gameHeight - 194, 'backdrop1');
 	game.camera.x = player.x - width/2
-	game.camera.y = gameHeight - height;	
+	game.camera.y = gameHeight - height;
+	black.x = game.camera.x + width/2;
+	black.y = game.camera.y + height/2;
 	player.body.velocity.x = 0;
 	player.body.x = 545;
 	player.body.y = gameHeight - 200;
