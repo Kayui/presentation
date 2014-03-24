@@ -44,6 +44,7 @@ function preload(){
 	game.load.image('black', 'assets/black.png');
 	game.load.image('arrow', 'assets/arrow.png');
 	game.load.image('heart', 'assets/heart.png');
+	game.load.image('ball', 'assets/heart.png');
 }
 
 /* Globals */
@@ -589,15 +590,17 @@ function dim(){
 }
 
 function blackInScene7(){
+	game.physics.p2.gravity.y = 0;
 	player.destroy();
 	heart.destroy();
 	mainText12.destroy();
 	mainText13.destroy();
 	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
 	fadeT.onComplete.add(destroyObject, this);
-	player = game.add.sprite(150, gameHeight - 170, 'player');
+	player = game.add.sprite(width/2-50, gameHeight - 170, 'player');
+	player2 = game.add.sprite(width/2, gameHeight - 170, 'player');
 	player.anchor.setTo(0.5,0.5);
-	mainText14 = game.add.text(width/6, game.camera.y + 100, '', style);
+	mainText14 = game.add.text(width/6, game.camera.y + 100, '"GAMES ARE HALF-REAL" \n -ESPEN AARSETH', style);
 }
 
 
@@ -626,7 +629,7 @@ function blackInScene5(){
 	player = game.add.sprite(150, gameHeight - 170, 'player');
 	biggerPicture = game.add.sprite(150, gameHeight - 670, 'biggerPicture');
 
-	mainText11 = game.add.text(width/6, game.camera.y + 100, 'THE BODY IS OUR MAIN MEDIUM \n FOR BEING IN THE WORLD \n     (MERLEAU-PONTY)', style);
+	mainText11 = game.add.text(width/6, game.camera.y + 100, '"THE BODY IS OUR MAIN MEDIUM \n FOR BEING IN THE WORLD" \n -MERLEAU-PONTY', style);
 }
 
 function blackInScene4(){
