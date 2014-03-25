@@ -429,6 +429,8 @@ function update(){
 	/* SCENE FIVE */
 
 	if(activeScene == 'five'){
+		game.camera.x = 0;
+		game.camera.y = 1000;
 
 		if(countDown){
 			timer++;
@@ -454,15 +456,11 @@ function update(){
 		}
 
 		if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.W)){
-			if(player.x == 700 && moveEnabled){
+			if(player.x == 500 && moveEnabled){
 				moveEnabled = false;
 				movePlayer = game.add.tween(player).to( { y: player.y - 70 }, 400, Phaser.Easing.None, true);
 				movePlayer.onComplete.add(mergeBoxes, this);	
 			}
-		}
-
-		if(mainText11 != null){
-			mainText11.x = game.camera.x + width/6;
 		}
 	}
 
@@ -505,16 +503,16 @@ function update(){
 		game.camera.follow();
 
 		if(ball.y > height + ball.height){
-			ball.body.velocity.y = -200;
+			ball.body.velocity.y = -500;
 		}
-		else if(ball.y < ball.height){
-			ball.body.velocity.y = 200;	
+		else if(ball.y < ball.height + 100){
+			ball.body.velocity.y = 500;	
 		}
 		else if(ball.x < ball.width){
-			ball.body.velocity.x = 200;
+			ball.body.velocity.x = 500;
 		}
-		else if(ball.x > width + ball.width){
-			ball.body.velocity.x = -200;
+		else if(ball.x > width - ball.width){
+			ball.body.velocity.x = -500;
 		}
 
 		if(player.x < player.width){
@@ -525,6 +523,7 @@ function update(){
 		}
 
 		player.body.velocity.y = 0;
+		player.body.y = height - 100;
 	}
 
 	/*
@@ -560,6 +559,17 @@ function update(){
 
 function playerHit(){
 	jumping = false;
+}
+
+function ballHit(){
+	if(ball.body.velocity.y > 0){
+		console.log("up");
+		ball.body.velocity.y = -500;
+	}
+	else{
+		console.log("down");
+		ball.body.velocity.y = 500;
+	}
 }
 
 function enableMove(){
@@ -630,7 +640,7 @@ function blackInScene7(){
 	mainText13.destroy();
 	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
 	fadeT.onComplete.add(destroyObject, this);
-	player = game.add.sprite(width/2-50, height - 170, 'arka');
+	player = game.add.sprite(width/2-50, height - 100, 'arka');
 	ball = game.add.sprite(width/2, height - 170, 'ball');
 
 	game.physics.p2.enable(player);
@@ -640,10 +650,11 @@ function blackInScene7(){
 	game.physics.p2.enable(ball);
 	game.add.existing(ball);
 	ball.body.fixedRotation = true;
-	ball.body.velocity.x = 200;
-	ball.body.velocity.y = 300;
+	ball.body.velocity.x = 500;
+	ball.body.velocity.y = 500;
+	ball.body.onBeginContact.add(ballHit, this);
 	
-	mainText14 = game.add.text(width/6, game.camera.y + 100, '"GAMES ARE HALF-REAL" \n -ESPEN AARSETH', style);
+	mainText14 = game.add.text(200, 100, '"GAMES ARE HALF-REAL" \n -ESPEN AARSETH', style);
 }
 
 
@@ -670,9 +681,9 @@ function blackInScene5(){
 	fadeT.onComplete.add(destroyObject, this);
 
 	player = game.add.sprite(250, gameHeight - 170, 'player');
-	biggerPicture = game.add.sprite(500, gameHeight - 670, 'biggerPicture');
+	biggerPicture = game.add.sprite(300, gameHeight - 670, 'biggerPicture');
 
-	mainText11 = game.add.text(width/6, game.camera.y + 100, '"THE BODY IS OUR MAIN MEDIUM \n FOR BEING IN THE WORLD" \n -MERLEAU-PONTY', style);
+	mainText11 = game.add.text(320, 1100, '"THE BODY IS OUR MAIN MEDIUM \n FOR BEING IN THE WORLD" \n -MERLEAU-PONTY', style);
 }
 
 function blackInScene4(){
