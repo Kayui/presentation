@@ -19,7 +19,7 @@ var width = 1024;
 var height = 600;
 var gameWidth = 1350;
 var gameHeight = 1600;
-var game = new Phaser.Game(width, height, Phaser.AUTO, '', { preload: preload, create: create, update: update});
+var game = new Phaser.Game(width, height, Phaser.CANVAS, '', { preload: preload, create: create, update: update});
 game.transparent = true;
 
 /* Loading of assets goes here. */
@@ -317,13 +317,36 @@ function update(){
 		}
 
 		if(player.x < eye2.x - 100){
-			eye2.loadTexture('eyeLeft');
+			if(player.y < eye2.y - 100){
+				eye2.loadTexture('eyeUpLeft');	/*Eyes movement*/
+			}
+			else if(player.y > eye2.y + 100){
+				eye2.loadTexture('eyeLeft');	
+			}
+			else{
+				eye2.loadTexture('eyeSideLeft');
+			}
+
 		}
 		else if(player.x > eye2.x + 100){
-			eye2.loadTexture('eyeRight');
+			if(player.y < eye2.y - 100){
+				eye2.loadTexture('eyeUpRight');	/*Eyes movement*/
+			}
+			else if(player.y > eye2.y + 100){
+				eye2.loadTexture('eyeRight');	
+			}
+			else{
+				eye2.loadTexture('eyeSideRight');
+			}
 		}
 		else{
-			eye2.loadTexture('eye');	
+			if(player.y > eye2.y){
+				eye2.loadTexture('eye');	
+			}
+			if(player.y < eye2.y){
+				eye2.loadTexture('eyeUp');	
+			}
+			timer = 1200;
 		}
 
 		playerControls.y = player.y - 15;	/*Controller indicators*/
@@ -503,7 +526,7 @@ function update(){
 			mainTextTen.x = game.camera.x + width/6;
 		}
 
-		if(timer > 600){
+		if(timer > 1000){
 			dim();
 		}
 
@@ -523,7 +546,7 @@ function update(){
 			timer++;
 		}
 
-		if(timer > 200){
+		if(timer > 300){
 			dim();
 		}
 
@@ -580,7 +603,7 @@ function update(){
 			}
 		}
 
-		if(timer > 350){
+		if(timer > 600){
 			dim();
 		}
 	}
@@ -615,8 +638,8 @@ function update(){
 			game.add.tween(mainText15).to( { alpha: 1 }, 800, Phaser.Easing.None, true);
 		}
 
-		if(timer > 1400 && timer < 1500){
-			timer = 1600;
+		if(timer > 2200 && timer < 2300){
+			timer = 2400;
 			game.add.tween(mainText15).to( { alpha: 0 }, 400, Phaser.Easing.None, true);
 			mainText16 = game.add.text(250, 200, 'THE END', style);
 			mainText16.fontSize = 150;
