@@ -44,7 +44,8 @@ function preload(){
 	game.load.image('black', 'assets/black.png');
 	game.load.image('arrow', 'assets/arrow.png');
 	game.load.image('heart', 'assets/heart.png');
-	game.load.image('ball', 'assets/heart.png');
+	game.load.image('ball', 'assets/ball.png');
+	game.load.image('arka', 'assets/arka.png');
 }
 
 /* Globals */
@@ -386,6 +387,8 @@ function update(){
 		}		
 		else if(bounceCount == 13){
 			nextText2('VOMITING');
+			rightBlocked = true;
+			leftBlocked = true;
 			bounceCount++;	
 		}
 		else if(bounceCount > 13){
@@ -435,26 +438,25 @@ function update(){
 			dim();
 		}
 
-		game.camera.follow(player);
 		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A)){
 			if(player.x - 50 > 0 && moveEnabled){
 				moveEnabled = false;
-				movePlayer = game.add.tween(player).to( { x: player.x - 50 }, 400, Phaser.Easing.Bounce.In, true);
+				movePlayer = game.add.tween(player).to( { x: player.x - 50 }, 400, Phaser.Easing.None, true);
 				movePlayer.onComplete.add(enableMove, this);
 			}
 		}
 		else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D)){
-			if(player.x + 50 < gameWidth-50 && moveEnabled){
+			if(player.x + 50 < width-50 && moveEnabled){
 				moveEnabled = false;
-				movePlayer = game.add.tween(player).to( { x: player.x + 50 }, 400, Phaser.Easing.Bounce.In, true);
+				movePlayer = game.add.tween(player).to( { x: player.x + 50 }, 400, Phaser.Easing.None, true);
 				movePlayer.onComplete.add(enableMove, this);
 			}
 		}
 
 		if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.W)){
-			if(player.x == 350 && moveEnabled){
+			if(player.x == 700 && moveEnabled){
 				moveEnabled = false;
-				movePlayer = game.add.tween(player).to( { y: player.y - 70 }, 400, Phaser.Easing.Bounce.In, true);
+				movePlayer = game.add.tween(player).to( { y: player.y - 70 }, 400, Phaser.Easing.None, true);
 				movePlayer.onComplete.add(mergeBoxes, this);	
 			}
 		}
@@ -471,14 +473,14 @@ function update(){
 		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A)){
 			if(player.x - 50 > 0 && moveLeftEnabled){
 				moveLeftEnabled = false;
-				movePlayer = game.add.tween(player).to( { x: player.x - 700 }, 800, Phaser.Easing.Bounce.In, true);
+				movePlayer = game.add.tween(player).to( { x: player.x - 700 }, 800, Phaser.Easing. None, true);
 				movePlayer.onComplete.add(enableRightMove, this);
 			}
 		}
 		else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D)){
 			if(player.x + 50 < gameWidth-50 && moveRightEnabled){
 				moveRightEnabled = false;
-				movePlayer = game.add.tween(player).to( { x: player.x + 700 }, 800, Phaser.Easing.Bounce.In, true);
+				movePlayer = game.add.tween(player).to( { x: player.x + 700 }, 800, Phaser.Easing. None, true);
 				movePlayer.onComplete.add(enableLeftMove, this);
 			}
 		}
@@ -497,12 +499,39 @@ function update(){
 		}
 	}
 
+	/* SCENE SEVEN */
+
+	if(activeScene == 'seven'){
+		game.camera.follow();
+
+		if(ball.y > height + ball.height){
+			ball.body.velocity.y = -200;
+		}
+		else if(ball.y < ball.height){
+			ball.body.velocity.y = 200;	
+		}
+		else if(ball.x < ball.width){
+			ball.body.velocity.x = 200;
+		}
+		else if(ball.x > width + ball.width){
+			ball.body.velocity.x = -200;
+		}
+
+		if(player.x < player.width){
+			player.body.velocity.x = 200;
+		}
+		else if(player.x > width + player.width){
+			player.body.velocity.x = -200;
+		}
+
+		player.body.velocity.y = 0;
+	}
 
 	/*
 		PLAYER CONTROLS
 	*/
 
-	if(activeScene != 'intro' && activeScene != 'three' && activeScene != 'four' && activeScene != 'five' && activeScene != 'six' && activeScene != 'seven'){
+	if(activeScene != 'intro' && activeScene != 'three' && activeScene != 'four' && activeScene != 'five' && activeScene != 'six' && activeScene != 'sevenhalt'){
 		if(timer < 800){
 			player.body.velocity.x = 0;
 		}
@@ -518,10 +547,12 @@ function update(){
 				game.add.tween(playerControls).to( { alpha: 0 }, 400, Phaser.Easing.None, true);
 			}	
 		}
-		if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.W)){
-			if(!jumping){
-				player.body.velocity.y = -300;
-				jumping = true;
+		if(activeScene != 'seven'){
+			if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) || game.input.keyboard.isDown(Phaser.Keyboard.W)){
+				if(!jumping){
+					player.body.velocity.y = -300;
+					jumping = true;
+				}
 			}
 		}
 	}
@@ -585,11 +616,13 @@ function dim(){
 	else if(activeScene == 'six'){
 		fadeT.onComplete.add(blackInScene7, this);
 		timer = 0;
-		activeScene = 'seven';
+		activeScene = 'sevenhalt';
 	}
 }
 
 function blackInScene7(){
+	game.world.setBounds(0, 0, width, height);
+	activeScene = 'seven';
 	game.physics.p2.gravity.y = 0;
 	player.destroy();
 	heart.destroy();
@@ -597,9 +630,19 @@ function blackInScene7(){
 	mainText13.destroy();
 	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
 	fadeT.onComplete.add(destroyObject, this);
-	player = game.add.sprite(width/2-50, gameHeight - 170, 'player');
-	player2 = game.add.sprite(width/2, gameHeight - 170, 'player');
-	player.anchor.setTo(0.5,0.5);
+	player = game.add.sprite(width/2-50, height - 170, 'arka');
+	ball = game.add.sprite(width/2, height - 170, 'ball');
+
+	game.physics.p2.enable(player);
+	game.add.existing(player);
+	player.body.fixedRotation = true;
+
+	game.physics.p2.enable(ball);
+	game.add.existing(ball);
+	ball.body.fixedRotation = true;
+	ball.body.velocity.x = 200;
+	ball.body.velocity.y = 300;
+	
 	mainText14 = game.add.text(width/6, game.camera.y + 100, '"GAMES ARE HALF-REAL" \n -ESPEN AARSETH', style);
 }
 
@@ -626,8 +669,8 @@ function blackInScene5(){
 	fadeT = game.add.tween(black).to( { height: 1 }, 1400, Phaser.Easing.Cubic.Out, true)
 	fadeT.onComplete.add(destroyObject, this);
 
-	player = game.add.sprite(150, gameHeight - 170, 'player');
-	biggerPicture = game.add.sprite(150, gameHeight - 670, 'biggerPicture');
+	player = game.add.sprite(250, gameHeight - 170, 'player');
+	biggerPicture = game.add.sprite(500, gameHeight - 670, 'biggerPicture');
 
 	mainText11 = game.add.text(width/6, game.camera.y + 100, '"THE BODY IS OUR MAIN MEDIUM \n FOR BEING IN THE WORLD" \n -MERLEAU-PONTY', style);
 }
@@ -699,19 +742,19 @@ function nextText2(newText){
 		player.loadTexture('player2');
 	}
 	else if(newText == 'HEADACHES'){
-		mainTextSix = game.add.text(game.camera.x + width/7 + 100, game.camera.y + 300, newText, style);	
+		mainTextSix = game.add.text(game.camera.x + width/7 + 100, game.camera.y + 300, newText, style);
 		player.loadTexture('player3');
 	}
 	else if(newText == 'NAUSEA'){
-		mainTextSeven = game.add.text(game.camera.x + width/7 + 200, game.camera.y + 350, newText, style);	
+		mainTextSeven = game.add.text(game.camera.x + width/7 + 200, game.camera.y + 350, newText, style);
 		player.loadTexture('player4');
 	}
 	else if(newText == 'SWEATING'){
-		mainTextEight = game.add.text(game.camera.x + width/7 + 300, game.camera.y + 400, newText, style);	
+		mainTextEight = game.add.text(game.camera.x + width/7 + 300, game.camera.y + 400, newText, style);
 		player.loadTexture('player5');
 	}
 	else if(newText == 'VOMITING'){
-		mainTextNine = game.add.text(game.camera.x + width/7 + 400, game.camera.y + 450, newText, style);	
+		mainTextNine = game.add.text(game.camera.x + width/7 + 400, game.camera.y + 450, newText, style);
 		player.loadTexture('player6');
 		timer = 0;
 	}
